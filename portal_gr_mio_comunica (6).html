@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Grêmio Conecta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
+
+    <div id="app" class="min-h-screen flex flex-col">
+        
+        <!-- LOGIN SCREEN -->
+        <div id="login-screen" class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800">
+            <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 space-y-6 relative overflow-hidden border border-white/20">
+                <div class="text-center space-y-2">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 mb-2 shadow-inner">
+                        <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">Grêmio Conecta</h1>
+                    <p class="text-sm text-slate-500">Portal de Acesso dos Gremistas, Comissão e Direção</p>
+                </div>
+
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Usuário / Login</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-slate-50/50" placeholder="Digite seu usuário">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Senha</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-slate-50/50" placeholder="••••••••">
+                        </div>
+                    </div>
+
+                    <div id="login-error" class="hidden p-3 rounded-xl bg-red-50 text-red-600 text-xs font-medium text-center">
+                        Usuário ou senha inválidos!
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition duration-200 flex items-center justify-center gap-2">
+                        <span>Entrar no Portal</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD SCREEN -->
+        <div id="dashboard-screen" class="hidden min-h-screen flex flex-col bg-slate-100">
+            
+            <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20">
+                            GC
+                        </div>
+                        <div>
+                            <span class="font-bold text-slate-800 text-lg block leading-none">Grêmio Conecta</span>
+                            <span class="text-xs text-slate-500">Sistema Gestor Escolar</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <button id="btn-notifications" onclick="showUserMessagesModal()" class="relative p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition" title="Avisos e Mensagens">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span id="unread-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full"></span>
+                        </button>
+
+                        <div class="text-right hidden sm:block">
+                            <span id="user-display-name" class="font-semibold text-sm block text-slate-800"></span>
+                            <span id="user-role-badge" class="inline-block px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-700 uppercase"></span>
+                        </div>
+                        <button id="btn-logout" class="p-2 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 transition" title="Sair">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+                
+                <!-- BANNER DE BOAS-VINDAS -->
+                <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                    <div class="relative z-10 space-y-2">
+                        <span id="user-tag-header" class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold uppercase tracking-wider">Painel de Acesso</span>
+                        <h2 id="welcome-message" class="text-xl sm:text-3xl font-black tracking-tight"></h2>
+                        <p id="welcome-subtext" class="text-blue-100 text-sm sm:text-base max-w-2xl"></p>
+                    </div>
+                    <div class="absolute right-[-20px] bottom-[-20px] opacity-10 text-white pointer-events-none">
+                        <i data-lucide="award" class="w-64 h-64"></i>
+                    </div>
+                </div>
+
+                <!-- NAVIGATION TABS CONTAINER -->
+                <div id="tabs-navigation" class="flex border-b border-slate-200 overflow-x-auto no-scrollbar gap-2 sm:gap-3 pb-2">
+                    <!-- Tabs build dynamically per user role -->
+                </div>
+
+                <!-- ================= TAB CONTENTS ================= -->
+
+                <!-- TAB: PAINEL ADM (EXCLUSIVO PARA ADM) -->
+                <div id="tab-painel-adm" class="tab-content hidden space-y-6">
+                    
+                    <!-- ADM COUNTERS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-amber-100 text-amber-700 rounded-xl">
+                                <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 font-semibold uppercase">Total Pendências</span>
+                                <h4 id="count-pending-total" class="text-2xl font-bold text-slate-800">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-indigo-100 text-indigo-700 rounded-xl">
+                                <i data-lucide="user-check" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 font-semibold uppercase">Indicações Comissão</span>
+                                <h4 id="count-pending-indica" class="text-2xl font-bold text-slate-800">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-purple-100 text-purple-700 rounded-xl">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 font-semibold uppercase">Pedidos Direção</span>
+                                <h4 id="count-pending-direcao" class="text-2xl font-bold text-slate-800">0</h4>
+                            </div>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                            <div class="p-3 bg-blue-100 text-blue-700 rounded-xl">
+                                <i data-lucide="users" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <span class="text-xs text-slate-500 font-semibold uppercase">Usuários Ativos</span>
+                                <h4 id="count-total-users" class="text-2xl font-bold text-slate-800">0</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CENTRAL DE PENDÊNCIAS (PROJETOS, INDICAÇÕES E PEDIDOS DA DIREÇÃO) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
+                            Central de Pendências para Aprovação / Gestão
+                        </h3>
+
+                        <!-- SUB-TABS PENDENCIAS -->
+                        <div class="flex border-b border-slate-100 gap-4 text-sm font-semibold text-slate-500">
+                            <button onclick="switchAdmSubtab('indicacoes')" id="subtab-btn-indicacoes" class="pb-2 border-b-2 border-blue-600 text-blue-600">
+                                Indicações Comissão (<span id="badge-count-indica">0</span>)
+                            </button>
+                            <button onclick="switchAdmSubtab('projetos')" id="subtab-btn-projetos" class="pb-2 border-b-2 border-transparent hover:text-slate-700">
+                                Projetos Recebidos (<span id="badge-count-proj">0</span>)
+                            </button>
+                            <button onclick="switchAdmSubtab('direcao')" id="subtab-btn-direcao" class="pb-2 border-b-2 border-transparent hover:text-slate-700">
+                                Pedidos da Direção (<span id="badge-count-direcao">0</span>)
+                            </button>
+                        </div>
+
+                        <!-- LISTA INDICAÇÕES DA COMISSÃO (AUTORIZAR OU RECUSAR) -->
+                        <div id="adm-subtab-indicacoes" class="space-y-4">
+                            <!-- Rendered dynamically -->
+                        </div>
+
+                        <!-- LISTA PROJETOS ENVIADOS -->
+                        <div id="adm-subtab-projetos" class="hidden space-y-4">
+                            <!-- Rendered dynamically -->
+                        </div>
+
+                        <!-- LISTA PEDIDOS DA DIREÇÃO -->
+                        <div id="adm-subtab-direcao" class="hidden space-y-4">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- ENVIAR MENSAGEM / BROADCAST -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="megaphone" class="w-5 h-5 text-indigo-600"></i>
+                            Painel de Envio de Mensagens e Avisos Globais
+                        </h3>
+                        <p class="text-slate-500 text-sm">A mensagem enviada aqui aparecerá em destaque assim que o usuário selecionado entrar no sistema.</p>
+
+                        <form id="form-send-msg" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Destinatário *</label>
+                                    <select id="msg-target" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                                        <option value="ALL">Todos os Usuários</option>
+                                        <option value="GREMISTA">Todos os Gremistas</option>
+                                        <option value="COMISSAO">Toda a Comissão</option>
+                                        <option value="DIRECAO">Direção Escolar</option>
+                                        <!-- Dynamically list individual users -->
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Título do Aviso *</label>
+                                    <input type="text" id="msg-title" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ex: Reunião Geral Extraordinária">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Conteúdo da Mensagem *</label>
+                                <textarea id="msg-body" rows="3" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Digite o aviso urgente ou informativo..."></textarea>
+                            </div>
+
+                            <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow transition flex items-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                <span>Enviar Aviso Importante</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- CADASTRAR NOVO USUÁRIO -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-blue-600"></i>
+                                Cadastrar Novo Usuário
+                            </h3>
+
+                            <form id="form-add-user" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Nome Completo *</label>
+                                    <input type="text" id="new-user-name" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Ex: Lucas Silva">
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Login / Usuário *</label>
+                                        <input type="text" id="new-user-login" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="lucassilva">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Senha *</label>
+                                        <input type="text" id="new-user-password" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="123456">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Tipo de Cargo *</label>
+                                        <select id="new-user-role-type" onchange="toggleCoordenadorSelect()" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
+                                            <option value="GREMISTA">Gremista</option>
+                                            <option value="COORDENADOR">Coordenador Gremista</option>
+                                            <option value="COMISSAO">Comissão</option>
+                                            <option value="DIRECAO">Direção Escolar</option>
+                                            <option value="ADM">ADM (Administrador)</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="box-select-coordenador" class="hidden">
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Indicado por *</label>
+                                        <select id="new-user-coordinator" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
+                                            <!-- Dynamically filled -->
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl shadow transition flex items-center justify-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    <span>Cadastrar Usuário</span>
+                                </button>
+                            </form>
+
+                            <!-- USER LIST -->
+                            <div class="pt-4 border-t border-slate-100">
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Usuários Registrados</h4>
+                                <div id="users-list-container" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                                    <!-- Rendered dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PUBLICAR EVENTO NO CALENDÁRIO 2027 -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="calendar-plus" class="w-5 h-5 text-indigo-600"></i>
+                                Publicar Data no Calendário (2027)
+                            </h3>
+
+                            <form id="form-add-event" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Título do Evento *</label>
+                                    <input type="text" id="event-title" required class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ex: Feira de Ideias 2027">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Data (2027) *</label>
+                                        <input type="date" id="event-date" required min="2027-01-01" max="2027-12-31" value="2027-01-01" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Tipo de Data</label>
+                                        <select id="event-type" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                                            <option value="projeto">Projeto do Grêmio</option>
+                                            <option value="prova">Provas / Avaliações</option>
+                                            <option value="feriado">Feriado / Recesso</option>
+                                            <option value="reuniao">Reunião Geral</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Observações</label>
+                                    <textarea id="event-desc" rows="2" class="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Instruções adicionais..."></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow transition flex items-center justify-center gap-2">
+                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    <span>Salvar Evento</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: PAINEL DA DIREÇÃO -->
+                <div id="tab-painel-direcao" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="building-2" class="w-6 h-6 text-purple-600"></i>
+                            Painel de Controle da Direção Escolar
+                        </h3>
+                        <p class="text-sm text-slate-500">Supervisione o Grêmio Estudantil, Comissão, Projetos e envie solicitações oficiais.</p>
+                    </div>
+
+                    <!-- SUB-ABAS DA DIREÇÃO -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- MENSAGENS E SOLICITAÇÕES DIREÇÃO -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                            <h4 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="send" class="w-5 h-5 text-purple-600"></i>
+                                Enviar Pedido / Mensagem à Liderança do Grêmio & ADM
+                            </h4>
+
+                            <form id="form-pedidos-direcao" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Título da Solicitação *</label>
+                                    <input type="text" id="pedido-titulo" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Ex: Solicitação de Apoio na Feira Cultural">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Destinatário Principal</label>
+                                    <select id="pedido-destinatario" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm bg-white">
+                                        <option value="ADM">Administração do Grêmio (ADM)</option>
+                                        <option value="GREMIO">Toda a Liderança Gremista</option>
+                                        <option value="COMISSAO">Membros da Comissão</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Detalhamento do Pedido *</label>
+                                    <textarea id="pedido-descricao" rows="4" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Descreva o pedido, diretrizes ou demanda da direção..."></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium text-sm rounded-xl shadow transition flex items-center justify-center gap-2">
+                                    <i data-lucide="send" class="w-4 h-4"></i>
+                                    <span>Enviar Pedido Oficial</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- LISTA DE SOLICITAÇÕES JÁ ENVIADAS PELA DIREÇÃO -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                            <h4 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="history" class="w-5 h-5 text-indigo-600"></i>
+                                Histórico de Pedidos Enviados pela Direção
+                            </h4>
+                            <div id="direcao-pedidos-list" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                                <!-- Rendered Dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENVIAR PROJETOS / PROPOSTAS -->
+                <div id="tab-envio-projetos" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div class="mb-6">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="send" class="w-5 h-5 text-blue-600"></i>
+                                Enviar ou Digitar Novo Projeto / Proposta
+                            </h3>
+                            <p class="text-slate-500 text-sm">A proposta será submetida diretamente para análise da administração do Grêmio.</p>
+                        </div>
+
+                        <form id="form-submit-project" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Título do Projeto *</label>
+                                <input type="text" id="project-title" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Ex: Gincana Cultural 2027">
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Categoria</label>
+                                    <select id="project-category" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white">
+                                        <option value="Esporte">Esporte & Lazer</option>
+                                        <option value="Cultura">Cultura & Arte</option>
+                                        <option value="Estudos">Estudos & Acadêmico</option>
+                                        <option value="Social">Ação Social / Meio Ambiente</option>
+                                        <option value="Infraestrutura">Infraestrutura Escolar</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Previsão / Data Proposta (2027)</label>
+                                    <input type="date" id="project-target-date" min="2027-01-01" max="2027-12-31" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Descrição / Objetivos *</label>
+                                <textarea id="project-description" rows="4" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" placeholder="Detalhe as ações, cronograma básico e benefícios..."></textarea>
+                            </div>
+
+                            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-xl shadow-md transition flex items-center gap-2">
+                                <i data-lucide="send" class="w-4 h-4"></i>
+                                <span>Enviar Projeto para Administração</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- PROJETOS ATRIBUÍDOS / SUA ATRIBUIÇÃO -->
+                <div id="tab-projetos-atribuidos" class="tab-content hidden space-y-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">Projetos sob sua Responsabilidade / Atribuição</h3>
+                        <p class="text-sm text-slate-500">Projetos em que você é responsável ou designado para colaborar.</p>
+                    </div>
+
+                    <div id="assigned-projects-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- VISUALIZAR TODOS OS PROJETOS DA ESCOLA -->
+                <div id="tab-todos-projetos" class="tab-content hidden space-y-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">Todos os Projetos do Grêmio (2027)</h3>
+                        <p class="text-sm text-slate-500">Acompanhe o andamento geral das iniciativas escolares.</p>
+                    </div>
+
+                    <div id="all-projects-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- CALENDÁRIO 2027 -->
+                <div id="tab-calendario" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="calendar" class="w-6 h-6 text-indigo-600"></i>
+                                Calendário de Eventos & Datas Importantes (2027)
+                            </h3>
+                            <p class="text-sm text-slate-500">Provas, feriados, reuniões e eventos publicados pela Administração.</p>
+                        </div>
+
+                        <!-- Filter Buttons -->
+                        <div class="flex gap-2 border-b border-slate-100 pb-3 overflow-x-auto">
+                            <button class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700" data-filter="all">Todos</button>
+                            <button class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600" data-filter="projeto">Projetos</button>
+                            <button class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600" data-filter="prova">Provas & Avaliações</button>
+                            <button class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600" data-filter="feriado">Feriados / Recesso</button>
+                            <button class="calendar-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-600" data-filter="reuniao">Reuniões</button>
+                        </div>
+
+                        <div id="events-timeline" class="space-y-3">
+                            <!-- Rendered Dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INDICAR COMISSÃO -->
+                <div id="tab-indicar-comissao" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="user-plus" class="w-5 h-5 text-indigo-600"></i>
+                                Indicar Membro para Comissão
+                            </h3>
+                            <p class="text-sm text-slate-500">Preencha os dados do estudante. Todas as indicações passam por aprovação do ADM antes de entrarem na comissão oficial.</p>
+                        </div>
+
+                        <form id="form-indicar-comissao" class="space-y-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Nome Completo *</label>
+                                    <input type="text" id="nom-comissao" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ex: Lucas Mendes">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Sala / Turma *</label>
+                                    <input type="text" id="sala-comissao" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ex: 2º Ano B">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Período *</label>
+                                    <select id="periodo-comissao" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
+                                        <option value="Manhã">Manhã</option>
+                                        <option value="Tarde">Tarde</option>
+                                        <option value="Noite">Noite</option>
+                                        <option value="Integral">Integral</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Motivo da Indicação *</label>
+                                    <input type="text" id="motivo-comissao" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm" placeholder="Ex: Excelente liderança e organização">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow transition flex items-center gap-2">
+                                <i data-lucide="check" class="w-4 h-4"></i>
+                                <span>Submeter Indicação ao ADM</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ENVIO DE TRABALHO / TAREFAS SOLICITADAS -->
+                <div id="tab-envio-trabalho" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="upload-cloud" class="w-5 h-5 text-purple-600"></i>
+                                Envio de Trabalho / Comprovantes
+                            </h3>
+                            <p class="text-sm text-slate-500">Envie prints, fotos de cadernos e tarefas solicitadas pela administração.</p>
+                        </div>
+
+                        <form id="form-envio-trabalho" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Título / Identificação do Trabalho *</label>
+                                <input type="text" id="trabalho-titulo" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Ex: Fotos das Atividades de História">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Anexo / Imagem / Link do Drive *</label>
+                                <input type="text" id="trabalho-link" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Cole o link da foto/print ou insira a descrição completa">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Observações Gerais</label>
+                                <textarea id="trabalho-obs" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm" placeholder="Anotações adicionais para o ADM..."></textarea>
+                            </div>
+
+                            <button type="submit" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium text-sm rounded-xl shadow transition flex items-center gap-2">
+                                <i data-lucide="upload" class="w-4 h-4"></i>
+                                <span>Enviar Comprovante</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- SUA COMISSÃO / INTEGRANTES -->
+                <div id="tab-sua-comissao" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+                            Integrantes Oficiais da Comissão
+                        </h3>
+                        <div id="lista-membros-comissao" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL MENSAGENS E AVISOS DO USUÁRIO -->
+    <div id="modal-messages" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+        <div class="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-6 space-y-4 relative border border-slate-100 animate-in fade-in zoom-in duration-200">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2 text-indigo-600 font-bold">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span>Mensagens e Avisos</span>
+                </div>
+                <button onclick="closeUserMessagesModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="modal-messages-body" class="space-y-3 max-h-80 overflow-y-auto pr-1 text-sm text-slate-600">
+                <!-- Rendered dynamically -->
+            </div>
+
+            <button onclick="closeUserMessagesModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm rounded-xl transition">
+                Ciente / Fechar
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm font-medium border border-slate-700">
+        <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>
+        <span id="toast-message">Ação concluída!</span>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA E DADOS -->
+    <script>
+        const DEFAULT_USERS = [
+            { 
+                id: 'u_adm_miguel', 
+                username: 'Miguel', 
+                password: '09281226', 
+                name: 'Miguel', 
+                roleType: 'ADM', 
+                roleName: 'Administrador Geral',
+                indicatedBy: null 
+            }
+        ];
+
+        let users = JSON.parse(localStorage.getItem('gremio_users_v3')) || DEFAULT_USERS;
+        let events = JSON.parse(localStorage.getItem('gremio_events_v3')) || [];
+        let projects = JSON.parse(localStorage.getItem('gremio_projects_v3')) || [];
+        let indicacoesComissao = JSON.parse(localStorage.getItem('gremio_indicacoes_v3')) || [];
+        let trabalhosEnviados = JSON.parse(localStorage.getItem('gremio_trabalhos_v3')) || [];
+        let systemMessages = JSON.parse(localStorage.getItem('gremio_messages_v3')) || [];
+        let pedidosDirecao = JSON.parse(localStorage.getItem('gremio_pedidos_v3')) || [];
+
+        let currentUser = null;
+        let activeCalendarFilter = 'all';
+        let activeAdmSubtab = 'indicacoes';
+
+        function saveData() {
+            localStorage.setItem('gremio_users_v3', JSON.stringify(users));
+            localStorage.setItem('gremio_events_v3', JSON.stringify(events));
+            localStorage.setItem('gremio_projects_v3', JSON.stringify(projects));
+            localStorage.setItem('gremio_indicacoes_v3', JSON.stringify(indicacoesComissao));
+            localStorage.setItem('gremio_trabalhos_v3', JSON.stringify(trabalhosEnviados));
+            localStorage.setItem('gremio_messages_v3', JSON.stringify(systemMessages));
+            localStorage.setItem('gremio_pedidos_v3', JSON.stringify(pedidosDirecao));
+        }
+
+        function showToast(message, isSuccess = true) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = message;
+            if (isSuccess) {
+                toastIcon.setAttribute('data-lucide', 'check-circle');
+                toastIcon.className = 'w-5 h-5 text-emerald-400';
+            } else {
+                toastIcon.setAttribute('data-lucide', 'alert-circle');
+                toastIcon.className = 'w-5 h-5 text-rose-400';
+            }
+            lucide.createIcons();
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userIn = document.getElementById('login-username').value.trim();
+            const passIn = document.getElementById('login-password').value.trim();
+
+            const foundUser = users.find(u => u.username.toLowerCase() === userIn.toLowerCase() && u.password === passIn);
+
+            if (foundUser) {
+                currentUser = foundUser;
+                document.getElementById('login-error').classList.add('hidden');
+                document.getElementById('login-form').reset();
+                initDashboard();
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            currentUser = null;
+            document.getElementById('dashboard-screen').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        });
+
+        function initDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
+
+            document.getElementById('user-display-name').innerText = currentUser.name;
+            document.getElementById('user-role-badge').innerText = currentUser.roleType;
+
+            const welcomeMsg = document.getElementById('welcome-message');
+            const welcomeSub = document.getElementById('welcome-subtext');
+
+            if (currentUser.roleType === 'COMISSAO') {
+                welcomeMsg.innerText = `OLÁ COMISSIONADA ${currentUser.name.toUpperCase()}`;
+                welcomeSub.innerText = `VC É INDICADA PELO(A) COORDENADOR(A) / INTEGRANTE ${currentUser.indicatedBy ? currentUser.indicatedBy.toUpperCase() : 'NÃO ESPECIFICADO'}`;
+            } else if (currentUser.roleType === 'DIRECAO') {
+                welcomeMsg.innerText = `BEM-VINDO(A) DIREÇÃO ${currentUser.name.toUpperCase()}`;
+                welcomeSub.innerText = `Painel Executivo de Acompanhamento e Comunicação com o Grêmio Conecta.`;
+            } else {
+                welcomeMsg.innerText = `OLÁ ${currentUser.name.toUpperCase()} ESSE É O SEU PORTAL GRÊMIO CONECTA`;
+                welcomeSub.innerText = `Acompanhe seus projetos, eventos e interaja com a liderança gremista.`;
+            }
+
+            setupTabs();
+            renderAll();
+            checkAndShowUserMessages();
+        }
+
+        function checkAndShowUserMessages() {
+            const userMsgs = getMessagesForUser();
+            const unread = userMsgs.filter(m => !m.readBy?.includes(currentUser.id));
+
+            const badge = document.getElementById('unread-badge');
+            if (unread.length > 0) {
+                badge.classList.remove('hidden');
+                showUserMessagesModal();
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function getMessagesForUser() {
+            return systemMessages.filter(m => 
+                m.target === 'ALL' || 
+                m.target === currentUser.roleType || 
+                m.target === currentUser.id
+            );
+        }
+
+        function showUserMessagesModal() {
+            const userMsgs = getMessagesForUser();
+            const container = document.getElementById('modal-messages-body');
+
+            if (userMsgs.length === 0) {
+                container.innerHTML = `<p class="text-center py-6 text-slate-400">Nenhum aviso no momento.</p>`;
+            } else {
+                container.innerHTML = userMsgs.map(m => `
+                    <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50 space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-800 text-sm">${m.title}</span>
+                            <span class="text-[10px] text-slate-400">${m.date}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">${m.body}</p>
+                        <span class="text-[10px] text-indigo-600 font-semibold block pt-1">Enviado por ADM</span>
+                    </div>
+                `).join('');
+
+                // Mark read
+                userMsgs.forEach(m => {
+                    if (!m.readBy) m.readBy = [];
+                    if (!m.readBy.includes(currentUser.id)) m.readBy.push(currentUser.id);
+                });
+                saveData();
+                document.getElementById('unread-badge').classList.add('hidden');
+            }
+
+            document.getElementById('modal-messages').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeUserMessagesModal() {
+            document.getElementById('modal-messages').classList.add('hidden');
+        }
+
+        function setupTabs() {
+            const tabsContainer = document.getElementById('tabs-navigation');
+            tabsContainer.innerHTML = '';
+
+            let tabButtonsHTML = '';
+
+            if (currentUser.roleType === 'ADM') {
+                tabButtonsHTML += `
+                    <button data-tab="painel-adm" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-amber-500 text-white shadow-sm">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i>
+                        <span>Painel ADM</span>
+                    </button>
+                    <button data-tab="envio-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>Enviar Projetos</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                `;
+            } else if (currentUser.roleType === 'DIRECAO') {
+                tabButtonsHTML += `
+                    <button data-tab="painel-direcao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-purple-600 text-white shadow-sm">
+                        <i data-lucide="building-2" class="w-4 h-4"></i>
+                        <span>Painel Direção</span>
+                    </button>
+                    <button data-tab="todos-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="folder" class="w-4 h-4"></i>
+                        <span>Projetos Grêmio</span>
+                    </button>
+                    <button data-tab="sua-comissao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span>Comissão</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                `;
+            } else if (currentUser.roleType === 'COMISSAO') {
+                tabButtonsHTML += `
+                    <button data-tab="projetos-atribuidos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-blue-600 text-white shadow-sm">
+                        <i data-lucide="briefcase" class="w-4 h-4"></i>
+                        <span>Sua Atribuição</span>
+                    </button>
+                    <button data-tab="envio-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Envio de Propostas</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                `;
+            } else {
+                // GREMISTA / COORDENADOR
+                tabButtonsHTML += `
+                    <button data-tab="envio-projetos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap bg-blue-600 text-white shadow-sm">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Envie Projetos</span>
+                    </button>
+                    <button data-tab="projetos-atribuidos" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="briefcase" class="w-4 h-4"></i>
+                        <span>Projetos Atribuídos</span>
+                    </button>
+                    <button data-tab="calendario" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="calendar" class="w-4 h-4"></i>
+                        <span>Calendário</span>
+                    </button>
+                    <button data-tab="indicar-comissao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>Indicar Comissão</span>
+                    </button>
+                    <button data-tab="envio-trabalho" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                        <span>Envio de Trabalho</span>
+                    </button>
+                    <button data-tab="sua-comissao" class="tab-btn px-4 py-2 rounded-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap text-slate-600 hover:bg-white">
+                        <i data-lucide="users" class="w-4 h-4"></i>
+                        <span>Sua Comissão</span>
+                    </button>
+                `;
+            }
+
+            tabsContainer.innerHTML = tabButtonsHTML;
+
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+                    switchTab(targetTab);
+                });
+            });
+
+            const defaultTab = currentUser.roleType === 'ADM' ? 'painel-adm' : 
+                               (currentUser.roleType === 'DIRECAO' ? 'painel-direcao' : 
+                               (currentUser.roleType === 'COMISSAO' ? 'projetos-atribuidos' : 'envio-projetos'));
+            switchTab(defaultTab);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                b.classList.remove('bg-blue-600', 'bg-amber-500', 'bg-purple-600', 'text-white', 'shadow-sm');
+                b.classList.add('text-slate-600', 'hover:bg-white');
+            });
+
+            const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                let bgClass = 'bg-blue-600';
+                if (tabId === 'painel-adm') bgClass = 'bg-amber-500';
+                if (tabId === 'painel-direcao') bgClass = 'bg-purple-600';
+
+                activeBtn.classList.add(bgClass, 'text-white', 'shadow-sm');
+                activeBtn.classList.remove('text-slate-600', 'hover:bg-white');
+            }
+
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            const targetContent = document.getElementById(`tab-${tabId}`);
+            if (targetContent) targetContent.classList.remove('hidden');
+
+            lucide.createIcons();
+        }
+
+        function renderAll() {
+            renderAssignedProjects();
+            renderAllProjects();
+            renderCalendar();
+            renderComissaoList();
+            renderDirecaoPanel();
+            if (currentUser.roleType === 'ADM') {
+                renderAdminPanel();
+            }
+            lucide.createIcons();
+        }
+
+        function renderAssignedProjects() {
+            const container = document.getElementById('assigned-projects-list');
+            const assigned = projects.filter(p => p.assignedToId === currentUser.id);
+
+            if (assigned.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-sm">
+                        Nenhum projeto atribuído diretamente a você no momento.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = assigned.map(p => `
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-blue-600">${p.category}</span>
+                            <h4 class="font-bold text-slate-800 text-base">${p.title}</h4>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold ${
+                            p.status === 'Concluído' ? 'bg-emerald-100 text-emerald-700' :
+                            p.status === 'Em Andamento' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'
+                        }">${p.status}</span>
+                    </div>
+
+                    <p class="text-xs text-slate-600 leading-relaxed">${p.description}</p>
+
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span>Prazo: ${p.targetDate ? p.targetDate : 'Sem prazo'}</span>
+                        <select onchange="updateProjectStatus('${p.id}', this.value)" class="text-xs font-semibold px-2 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none">
+                            <option value="Pendente" ${p.status === 'Pendente' ? 'selected' : ''}>Pendente</option>
+                            <option value="Em Andamento" ${p.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+                            <option value="Concluído" ${p.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAllProjects() {
+            const container = document.getElementById('all-projects-list');
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 bg-white rounded-2xl border border-slate-200 p-8 text-center text-slate-400 text-sm">
+                        Nenhum projeto registrado até o momento.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = projects.map(p => `
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <span class="text-xs font-bold text-purple-600">[${p.category}]</span>
+                            <h4 class="font-bold text-slate-800 text-base">${p.title}</h4>
+                            <span class="text-[11px] text-slate-400">Autor: <strong>${p.authorName}</strong></span>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-xl text-xs font-bold ${
+                            p.status === 'Concluído' ? 'bg-emerald-100 text-emerald-700' :
+                            p.status === 'Em Andamento' ? 'bg-amber-100 text-amber-700' : 'bg-slate-100 text-slate-700'
+                        }">${p.status}</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">${p.description}</p>
+                </div>
+            `).join('');
+        }
+
+        function updateProjectStatus(projId, newStatus) {
+            const p = projects.find(item => item.id === projId);
+            if (p) {
+                p.status = newStatus;
+                saveData();
+                showToast(`Status alterado para: ${newStatus}`);
+                renderAll();
+            }
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('events-timeline');
+            let filtered = events;
+            if (activeCalendarFilter !== 'all') {
+                filtered = events.filter(e => e.type === activeCalendarFilter);
+            }
+
+            filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-400 text-sm">Nenhum evento postado para 2027.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(e => `
+                <div class="flex items-start gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition">
+                    <div class="flex flex-col items-center justify-center p-3 rounded-xl bg-white border border-slate-200 min-w-[65px] text-center">
+                        <span class="text-xs uppercase font-bold text-blue-600">${getMonthAbbr(e.date)}</span>
+                        <span class="text-xl font-black text-slate-800">${getDayNumber(e.date)}</span>
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <h4 class="font-bold text-slate-800 text-sm">${e.title}</h4>
+                        <p class="text-xs text-slate-500">${e.desc || 'Sem detalhes fornecidos.'}</p>
+                    </div>
+                    ${currentUser.roleType === 'ADM' ? `
+                        <button onclick="deleteEvent('${e.id}')" class="text-slate-400 hover:text-red-500 p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderComissaoList() {
+            const container = document.getElementById('lista-membros-comissao');
+            const comissaoUsers = users.filter(u => u.roleType === 'COMISSAO');
+
+            if (comissaoUsers.length === 0) {
+                container.innerHTML = `<p class="col-span-2 text-slate-400 text-sm py-4">Nenhum membro na comissão no momento.</p>`;
+                return;
+            }
+
+            container.innerHTML = comissaoUsers.map(u => `
+                <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-slate-800 text-sm block">${u.name}</span>
+                        <span class="text-xs text-slate-500">Indicado(a) por: <strong>${u.indicatedBy || 'N/A'}</strong></span>
+                    </div>
+                    <span class="px-2 py-1 rounded-md text-[10px] font-bold bg-purple-100 text-purple-700">Comissão</span>
+                </div>
+            `).join('');
+        }
+
+        function renderDirecaoPanel() {
+            const container = document.getElementById('direcao-pedidos-list');
+            if (!container) return;
+
+            if (pedidosDirecao.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 text-sm py-4 text-center">Nenhum pedido enviado ainda.</p>`;
+                return;
+            }
+
+            container.innerHTML = pedidosDirecao.map(p => `
+                <div class="p-3.5 rounded-xl border border-slate-100 bg-slate-50 space-y-1 text-xs">
+                    <div class="flex justify-between font-bold text-slate-800">
+                        <span>${p.titulo}</span>
+                        <span class="text-purple-600">${p.destinatario}</span>
+                    </div>
+                    <p class="text-slate-600">${p.descricao}</p>
+                    <span class="text-[10px] text-slate-400 block pt-1">Status: ${p.status || 'Enviado ao ADM'}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderAdminPanel() {
+            const pendingIndica = indicacoesComissao.filter(i => i.status === 'PENDENTE');
+            const pendingProj = projects.filter(p => p.status === 'Pendente');
+            const pendingDirecao = pedidosDirecao.filter(d => d.status !== 'Atendido');
+
+            document.getElementById('count-pending-indica').innerText = pendingIndica.length;
+            document.getElementById('count-pending-direcao').innerText = pendingDirecao.length;
+            document.getElementById('count-pending-total').innerText = pendingIndica.length + pendingProj.length + pendingDirecao.length;
+            document.getElementById('count-total-users').innerText = users.length;
+
+            document.getElementById('badge-count-indica').innerText = pendingIndica.length;
+            document.getElementById('badge-count-proj').innerText = pendingProj.length;
+            document.getElementById('badge-count-direcao').innerText = pendingDirecao.length;
+
+            // Render subtab 1: INDICAÇÕES
+            const containerIndica = document.getElementById('adm-subtab-indicacoes');
+            if (pendingIndica.length === 0) {
+                containerIndica.innerHTML = `<p class="text-slate-400 text-xs py-4 text-center">Sem indicações pendentes de aprovação.</p>`;
+            } else {
+                containerIndica.innerHTML = pendingIndica.map(i => `
+                    <div class="p-4 rounded-xl border border-amber-200 bg-amber-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-slate-800 text-sm">${i.nome}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">${i.sala} - ${i.periodo}</span>
+                            </div>
+                            <p class="text-xs text-slate-600"><strong>Motivo:</strong> ${i.motivo}</p>
+                            <span class="text-[11px] text-slate-400">Indicado por: <strong>${i.indicadoPor}</strong></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="approveIndication('${i.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> Autorizar
+                            </button>
+                            <button onclick="rejectIndication('${i.id}')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                                <i data-lucide="x" class="w-3.5 h-3.5"></i> Recusar
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render subtab 2: PROJETOS RECEBIDOS
+            const containerProj = document.getElementById('adm-subtab-projetos');
+            if (projects.length === 0) {
+                containerProj.innerHTML = `<p class="text-slate-400 text-xs py-4 text-center">Nenhum projeto submetido.</p>`;
+            } else {
+                containerProj.innerHTML = projects.map(p => `
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-blue-600">[${p.category}]</span>
+                                <h4 class="font-bold text-slate-800">${p.title}</h4>
+                                <span class="text-xs text-slate-400">Enviado por: <strong>${p.authorName}</strong></span>
+                            </div>
+                            <div>
+                                <select onchange="assignProject('${p.id}', this.value)" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 bg-white font-medium text-slate-700">
+                                    <option value="">Atribuir a Responsável...</option>
+                                    ${users.map(u => `
+                                        <option value="${u.id}" ${p.assignedToId === u.id ? 'selected' : ''}>${u.name} (${u.roleType})</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600">${p.description}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Render subtab 3: PEDIDOS DIREÇÃO
+            const containerDirecao = document.getElementById('adm-subtab-direcao');
+            if (pedidosDirecao.length === 0) {
+                containerDirecao.innerHTML = `<p class="text-slate-400 text-xs py-4 text-center">Nenhum pedido da Direção Escolar.</p>`;
+            } else {
+                containerDirecao.innerHTML = pedidosDirecao.map(d => `
+                    <div class="p-4 rounded-xl border border-purple-200 bg-purple-50/50 space-y-2">
+                        <div class="flex justify-between items-start">
+                            <h4 class="font-bold text-purple-900 text-sm">${d.titulo}</h4>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-200 text-purple-800">${d.destinatario}</span>
+                        </div>
+                        <p class="text-xs text-slate-700">${d.descricao}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Populate user target options for messages
+            const selectTarget = document.getElementById('msg-target');
+            let opts = `
+                <option value="ALL">Todos os Usuários</option>
+                <option value="GREMISTA">Todos os Gremistas</option>
+                <option value="COMISSAO">Toda a Comissão</option>
+                <option value="DIRECAO">Direção Escolar</option>
+            `;
+            users.forEach(u => {
+                opts += `<option value="${u.id}">Individual: ${u.name} (${u.roleType})</option>`;
+            });
+            selectTarget.innerHTML = opts;
+
+            // Render users list
+            const usersContainer = document.getElementById('users-list-container');
+            usersContainer.innerHTML = users.map(u => `
+                <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 bg-slate-50 text-xs">
+                    <div>
+                        <span class="font-bold text-slate-800 block">${u.name} (${u.roleType})</span>
+                        <span class="text-slate-400">Login: <span class="font-mono text-slate-600">${u.username}</span> | Senha: <span class="font-mono text-slate-600">${u.password}</span></span>
+                    </div>
+                    ${u.username.toLowerCase() !== 'miguel' ? `
+                        <button onclick="deleteUser('${u.id}')" class="text-slate-400 hover:text-red-500 p-1">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function switchAdmSubtab(tab) {
+            activeAdmSubtab = tab;
+            document.getElementById('adm-subtab-indicacoes').classList.add('hidden');
+            document.getElementById('adm-subtab-projetos').classList.add('hidden');
+            document.getElementById('adm-subtab-direcao').classList.add('hidden');
+
+            document.getElementById('subtab-btn-indicacoes').className = 'pb-2 border-b-2 border-transparent hover:text-slate-700';
+            document.getElementById('subtab-btn-projetos').className = 'pb-2 border-b-2 border-transparent hover:text-slate-700';
+            document.getElementById('subtab-btn-direcao').className = 'pb-2 border-b-2 border-transparent hover:text-slate-700';
+
+            if (tab === 'indicacoes') {
+                document.getElementById('adm-subtab-indicacoes').classList.remove('hidden');
+                document.getElementById('subtab-btn-indicacoes').className = 'pb-2 border-b-2 border-blue-600 text-blue-600 font-bold';
+            } else if (tab === 'projetos') {
+                document.getElementById('adm-subtab-projetos').classList.remove('hidden');
+                document.getElementById('subtab-btn-projetos').className = 'pb-2 border-b-2 border-blue-600 text-blue-600 font-bold';
+            } else if (tab === 'direcao') {
+                document.getElementById('adm-subtab-direcao').classList.remove('hidden');
+                document.getElementById('subtab-btn-direcao').className = 'pb-2 border-b-2 border-blue-600 text-blue-600 font-bold';
+            }
+        }
+
+        function approveIndication(id) {
+            const ind = indicacoesComissao.find(i => i.id === id);
+            if (ind) {
+                ind.status = 'APROVADO';
+                // Auto-create user for commission member
+                const loginClean = ind.nome.toLowerCase().replace(/\s+/g, '');
+                users.push({
+                    id: 'u_' + Date.now(),
+                    name: ind.nome,
+                    username: loginClean,
+                    password: '123',
+                    roleType: 'COMISSAO',
+                    indicatedBy: ind.indicadoPor
+                });
+                saveData();
+                showToast(`Indicação autorizada! Usuário "${loginClean}" cadastrado.`);
+                renderAll();
+            }
+        }
+
+        function rejectIndication(id) {
+            indicacoesComissao = indicacoesComissao.filter(i => i.id !== id);
+            saveData();
+            showToast('Indicação recusada.');
+            renderAll();
+        }
+
+        function toggleCoordenadorSelect() {
+            const roleType = document.getElementById('new-user-role-type').value;
+            const box = document.getElementById('box-select-coordenador');
+            const selectCoord = document.getElementById('new-user-coordinator');
+
+            if (roleType === 'COMISSAO') {
+                box.classList.remove('hidden');
+                const recommenders = users.filter(u => u.roleType === 'COORDENADOR' || u.roleType === 'GREMISTA' || u.roleType === 'ADM' || u.roleType === 'DIRECAO');
+                selectCoord.innerHTML = recommenders.map(c => `<option value="${c.name}">${c.name} (${c.roleType})</option>`).join('');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('form-submit-project').addEventListener('submit', (e) => {
+            e.preventDefault();
+            projects.push({
+                id: 'p_' + Date.now(),
+                title: document.getElementById('project-title').value.trim(),
+                category: document.getElementById('project-category').value,
+                targetDate: document.getElementById('project-target-date').value,
+                description: document.getElementById('project-description').value.trim(),
+                authorName: currentUser.name,
+                assignedToId: null,
+                status: 'Pendente'
+            });
+            saveData();
+            document.getElementById('form-submit-project').reset();
+            showToast('Projeto submetido com sucesso!');
+            renderAll();
+        });
+
+        document.getElementById('form-send-msg').addEventListener('submit', (e) => {
+            e.preventDefault();
+            systemMessages.push({
+                id: 'm_' + Date.now(),
+                target: document.getElementById('msg-target').value,
+                title: document.getElementById('msg-title').value.trim(),
+                body: document.getElementById('msg-body').value.trim(),
+                date: new Date().toLocaleDateString('pt-BR'),
+                readBy: []
+            });
+            saveData();
+            document.getElementById('form-send-msg').reset();
+            showToast('Aviso transmitido com sucesso!');
+        });
+
+        document.getElementById('form-pedidos-direcao').addEventListener('submit', (e) => {
+            e.preventDefault();
+            pedidosDirecao.push({
+                id: 'req_' + Date.now(),
+                titulo: document.getElementById('pedido-titulo').value.trim(),
+                destinatario: document.getElementById('pedido-destinatario').value,
+                descricao: document.getElementById('pedido-descricao').value.trim(),
+                status: 'Pendente'
+            });
+            saveData();
+            document.getElementById('form-pedidos-direcao').reset();
+            showToast('Solicitação oficial enviada ao ADM!');
+            renderAll();
+        });
+
+        document.getElementById('form-add-user').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const roleType = document.getElementById('new-user-role-type').value;
+            const name = document.getElementById('new-user-name').value.trim();
+            const username = document.getElementById('new-user-login').value.trim();
+
+            if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+                showToast('Login já existente!', false);
+                return;
+            }
+
+            users.push({
+                id: 'u_' + Date.now(),
+                name,
+                username,
+                password: document.getElementById('new-user-password').value.trim(),
+                roleType,
+                indicatedBy: roleType === 'COMISSAO' ? document.getElementById('new-user-coordinator').value : null
+            });
+
+            saveData();
+            document.getElementById('form-add-user').reset();
+            showToast('Usuário cadastrado com sucesso!');
+            renderAll();
+        });
+
+        document.getElementById('form-add-event').addEventListener('submit', (e) => {
+            e.preventDefault();
+            events.push({
+                id: 'e_' + Date.now(),
+                title: document.getElementById('event-title').value.trim(),
+                date: document.getElementById('event-date').value,
+                type: document.getElementById('event-type').value,
+                desc: document.getElementById('event-desc').value.trim()
+            });
+            saveData();
+            document.getElementById('form-add-event').reset();
+            showToast('Data publicada no Calendário!');
+            renderAll();
+        });
+
+        document.getElementById('form-indicar-comissao').addEventListener('submit', (e) => {
+            e.preventDefault();
+            indicacoesComissao.push({
+                id: 'ind_' + Date.now(),
+                nome: document.getElementById('nom-comissao').value.trim(),
+                sala: document.getElementById('sala-comissao').value.trim(),
+                periodo: document.getElementById('periodo-comissao').value,
+                motivo: document.getElementById('motivo-comissao').value.trim(),
+                indicadoPor: currentUser.name,
+                status: 'PENDENTE'
+            });
+            saveData();
+            document.getElementById('form-indicar-comissao').reset();
+            showToast('Indicação enviada ao ADM para aprovação!');
+        });
+
+        document.getElementById('form-envio-trabalho').addEventListener('submit', (e) => {
+            e.preventDefault();
+            trabalhosEnviados.push({
+                titulo: document.getElementById('trabalho-titulo').value.trim(),
+                link: document.getElementById('trabalho-link').value.trim(),
+                obs: document.getElementById('trabalho-obs').value.trim(),
+                aluno: currentUser.name
+            });
+            saveData();
+            document.getElementById('form-envio-trabalho').reset();
+            showToast('Comprovante enviado ao ADM!');
+        });
+
+        function assignProject(projId, userId) {
+            const p = projects.find(item => item.id === projId);
+            if (p) {
+                p.assignedToId = userId;
+                saveData();
+                showToast('Projeto atribuído com sucesso!');
+                renderAll();
+            }
+        }
+
+        function deleteUser(id) {
+            users = users.filter(u => u.id !== id);
+            saveData();
+            renderAll();
+        }
+
+        function deleteEvent(id) {
+            events = events.filter(e => e.id !== id);
+            saveData();
+            renderAll();
+        }
+
+        function getMonthAbbr(dateStr) {
+            if (!dateStr) return '';
+            const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            return months[parseInt(dateStr.split('-')[1]) - 1] || '';
+        }
+
+        function getDayNumber(dateStr) {
+            return dateStr ? dateStr.split('-')[2] : '';
+        }
+
+        window.onload = () => {
+            lucide.createIcons();
+        };
+    </script>
+</body>
+</html>
